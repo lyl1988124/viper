@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 @File    : upgrade_idps.py
-@Time    : 2021/9/6 16:11
+@Time    : 2021/8/16:15:14
 @Author  : liuyuanlong
 @Licence : (C) Copyright 2019-2020, ZettaCloud Xi'an
-@Desc    : 
+@Desc    : 自动化升级工具
 """
 import datetime
 import os
@@ -151,8 +151,12 @@ class UpgradeIdps(object):
 
             print(cmd_dump)
 
-            # 执行备份命令adsf
+            cmd_dump = "set PGPASSWORD=%s&&" + cmd_dump % \
+                       (self.configDict['db_pw'])
 
+            print(cmd_dump)
+
+            # 执行备份命令
             p = Popen(cmd_dump, shell=True)
             p.wait()
             if p.stderr is None:
@@ -176,12 +180,11 @@ class UpgradeIdps(object):
             pg_tool_path = os.path.abspath(".\\tools\\pgsql\\")
             print(pg_tool_path)
 
-            sql_file_path = os.path.join(unzipPath, 'idps-upgrade.sql')
+            sql_file_path = os.path.join(unzipPath, 'idps/idps-core/sql/idps-upgrade.sql')
 
             # 执行sql文件
-            cmd_upgrade = "set PGPASSWORD=%s&& %s\\psql -h %s -p %s -U %s -d %s -f %s" % \
-                          (self.configDict['db_pw'],
-                           pg_tool_path,
+            cmd_upgrade = "%s\\psql -h %s -p %s -U %s -d %s -f %s" % \
+                          (pg_tool_path,
                            self.configDict['db_host'],
                            self.configDict['db_port'],
                            self.configDict['db_user'],
@@ -190,7 +193,12 @@ class UpgradeIdps(object):
 
             print(cmd_upgrade)
 
-            # 执行备份命令
+            cmd_upgrade = "set PGPASSWORD=%s&&" + cmd_upgrade % \
+                          (self.configDict['db_pw'],)
+
+            print(cmd_upgrade)
+
+            # 执行sql
             p = Popen(cmd_upgrade, shell=True)
             p.wait()
             if p.stderr is None:
@@ -315,7 +323,6 @@ class UpgradeIdps(object):
 
     def checkUpgradeInCorrectDirectory(self):
 
-        print("checkUpgradeInCorrectDirectory")
         # 根据上级目录判定升级包是否在正确目录
         print(os.listdir('../'))
         idps_core_path = os.path.exists('../idps-core')
@@ -347,25 +354,25 @@ if __name__ == '__main__':
     upgrade = UpgradeIdps()
 
     # 检查升级包是否在正确目录
-    # path = upgrade.checkUpgradeInCorrectDirectory()
+    path = upgrade.checkUpgradeInCorrectDirectory()
 
     # 解压
-    # unzipPath = upgrade.unzipUpgrade(path)
+    unzipPath = upgrade.unzipUpgrade(path)
     #
     # 备份数据库
     upgrade.dbBackup()
     #
     # 备份idps
-    # upgrade.backupIdps()
+    upgrade.backupIdps()
 
     # 备份环境变量 2.5.1环境变量未变化
     # upgrade.backupAndUpdateCondaEnv()
 
     # 执行sql
-    upgrade.executeUpgradeSqlFile('./')
+    upgrade.executeUpgradeSqlFile(unzipPath)
 
     # 更新idps
-    # upgrade.copyUpgradeToIdps(unzipPath)
+    upgrade.copyUpgradeToIdps(unzipPath)
 
     # 更新conda env
     # upgrade.updateCondaEnv(unzipPath)
