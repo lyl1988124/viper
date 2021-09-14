@@ -77,7 +77,7 @@ class UpgradeIdps(object):
 
             firstUnzipCmd = unzip_abs_path + " x -y -p" + self.configDict[
                 'unzip_pw'] + " -o" + firstDstPath + " " + srcPath
-            print("firstUnzipCmd=" + firstUnzipCmd)
+            #print("firstUnzipCmd=" + firstUnzipCmd)
             p1 = Popen(firstUnzipCmd, shell=True)
             p1.wait()
 
@@ -98,7 +98,7 @@ class UpgradeIdps(object):
 
             secondUzipCmd = unzip_abs_path + " x -y -p" + self.configDict[
                 'unzip_pw'] + " -o" + secondDstPath + " " + secondSrcPath
-            print("secondUnzipCmd=" + secondUzipCmd)
+            #print("secondUnzipCmd=" + secondUzipCmd)
             p2 = Popen(secondUzipCmd, shell=True)
             p2.wait()
 
@@ -140,9 +140,8 @@ class UpgradeIdps(object):
             print(pg_tool_path)
 
             # 备份idps数据库
-            cmd_dump = "set PGPASSWORD=%s&& %s\\pg_dump -i -h %s -p %s -U %s -F c -b -v -f %s %s" % \
-                       (self.configDict['db_pw'],
-                        pg_tool_path,
+            cmd_dump = "%s\\pg_dump -i -h %s -p %s -U %s -F c -b -v -f %s %s" % \
+                       (pg_tool_path,
                         self.configDict['db_host'],
                         self.configDict['db_port'],
                         self.configDict['db_user'],
@@ -151,10 +150,9 @@ class UpgradeIdps(object):
 
             print(cmd_dump)
 
-            cmd_dump = "set PGPASSWORD=%s&&" + cmd_dump % \
-                       (self.configDict['db_pw'])
-
-            print(cmd_dump)
+            cmd_dump = "set PGPASSWORD=%s&& %s" % \
+                       (self.configDict['db_pw'],
+                        cmd_dump)
 
             # 执行备份命令
             p = Popen(cmd_dump, shell=True)
@@ -193,10 +191,9 @@ class UpgradeIdps(object):
 
             print(cmd_upgrade)
 
-            cmd_upgrade = "set PGPASSWORD=%s&&" + cmd_upgrade % \
-                          (self.configDict['db_pw'],)
-
-            print(cmd_upgrade)
+            cmd_upgrade = "set PGPASSWORD=%s&& %s" % \
+                          (self.configDict['db_pw'],
+                           cmd_upgrade)
 
             # 执行sql
             p = Popen(cmd_upgrade, shell=True)
