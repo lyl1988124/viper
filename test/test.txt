@@ -1,0 +1,7 @@
+os_type:Windows
+os_release:10 64bit  10.0.19041 
+os_distribution:Microsoft
+asset_type:server
+CPU CORE:12
+MEM:8192
+DISK:[{'capacity': 931}, {'capacity': 238}]

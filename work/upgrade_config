@@ -1,0 +1,9 @@
+# which be set, which will be use
+# database config
+db_host=172.16.30.90
+db_port=5432
+db_name=idps
+db_user=postgres
+db_pw=postgres
+# conda env path
+conda_env=C:\ProgramData\Anaconda3\envs
