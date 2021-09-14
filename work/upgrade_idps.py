@@ -77,7 +77,7 @@ class UpgradeIdps(object):
 
             firstUnzipCmd = unzip_abs_path + " x -y -p" + self.configDict[
                 'unzip_pw'] + " -o" + firstDstPath + " " + srcPath
-            #print("firstUnzipCmd=" + firstUnzipCmd)
+            # print("firstUnzipCmd=" + firstUnzipCmd)
             p1 = Popen(firstUnzipCmd, shell=True)
             p1.wait()
 
@@ -98,7 +98,7 @@ class UpgradeIdps(object):
 
             secondUzipCmd = unzip_abs_path + " x -y -p" + self.configDict[
                 'unzip_pw'] + " -o" + secondDstPath + " " + secondSrcPath
-            #print("secondUnzipCmd=" + secondUzipCmd)
+            # print("secondUnzipCmd=" + secondUzipCmd)
             p2 = Popen(secondUzipCmd, shell=True)
             p2.wait()
 
