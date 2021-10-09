@@ -108,10 +108,11 @@ class UpgradeIdps(object):
             unzipPath = secondDstPath + "/" + secondSrcPath[secondIndex + 1:-4]
             print(unzipPath)
 
-            #移动到临时目录
-            shutil.move(unzipPath,"./tmp")
+            # 移动到临时目录
+            tmpPath = "./tmp"
+            shutil.move(unzipPath, tmpPath)
 
-            #删除解压目录
+            # 删除解压目录
             shutil.rmtree(os.path.dirname(os.path.realpath(unzipPath)))
 
         except Exception as e:
@@ -121,7 +122,7 @@ class UpgradeIdps(object):
 
         print("升级文件解压完成！")
 
-        return unzipPath
+        return tmpPath
 
     def dbBackup(self):
 
@@ -364,28 +365,23 @@ if __name__ == '__main__':
 
 
     #
-    # #
-    # # 备份数据库
-    # upgrade.dbBackup()
-    # #
-    # # 备份idps
-    # upgrade.backupIdps()
+    # 备份数据库
+    upgrade.dbBackup()
     #
-    # # 备份环境变量 2.5.1环境变量未变化
-    # # upgrade.backupAndUpdateCondaEnv()
+    # 备份idps
+    upgrade.backupIdps()
+
+    # 备份环境变量 2.5.1环境变量未变化
+    # upgrade.backupAndUpdateCondaEnv()
+
+    # 执行sql
+    upgrade.executeUpgradeSqlFile(unzipPath)
+
+    # 更新idps
+    upgrade.copyUpgradeToIdps(unzipPath)
+
+    # 更新conda env
+    # upgrade.updateCondaEnv(unzipPath)
     #
-    # # 执行sql
-    # upgrade.executeUpgradeSqlFile(unzipPath)
-    #
-    # # 更新idps
-    # upgrade.copyUpgradeToIdps(unzipPath)
-    #
-    # # 更新conda env
-    # # upgrade.updateCondaEnv(unzipPath)
-    # #
-    # print("升级程序执行完成！")
-    # os.system('pause')
-    #
-    # # 删除解压文件
-    # shutil.rmtree(os.path.dirname(os.path.realpath(unzipPath)))
-    # print("delete tmp: " + os.path.dirname(os.path.realpath(unzipPath)))
+    print("升级程序执行完成！")
+    os.system('pause')
