@@ -11,6 +11,7 @@ import os
 import re
 import shutil
 import sys
+
 import time
 import zipfile
 from subprocess import Popen
@@ -24,7 +25,7 @@ class UpgradeIdps(object):
                   'db_pw': 'db_zettacloud',
                   'conda_env': 'C:\ProgramData\Anaconda3\envs',
                   'unzip_pw': 'idps.zettacloud.deploy',
-                  'idps_home_path': os.path.abspath('../'),
+                  'idps_home_path': os.path.abspath('../idps'),
                   'upgrade_file_path': ''
                   }
 
@@ -52,7 +53,7 @@ class UpgradeIdps(object):
                         if len(confInfo[1]) == 0:
                             continue
                         self.configDict.update({confInfo[0]: confInfo[1]})
-                    print(self.configDict)
+                    # print(self.configDict)
                     time.sleep(1)
             finally:
                 file.close()
@@ -106,6 +107,12 @@ class UpgradeIdps(object):
 
             unzipPath = secondDstPath + "/" + secondSrcPath[secondIndex + 1:-4]
             print(unzipPath)
+
+            #移动到临时目录
+            shutil.move(unzipPath,"./tmp")
+
+            #删除解压目录
+            shutil.rmtree(os.path.dirname(os.path.realpath(unzipPath)))
 
         except Exception as e:
             print(e)
@@ -262,10 +269,11 @@ class UpgradeIdps(object):
     def copyFile(self, src_path, dst_path):
 
         if not os.path.isfile(src_path):
+            print("copy directory %s -> %s" % (src_path, dst_path))
             shutil.copytree(src_path, dst_path)
         else:
+            print("copy file %s -> %s" % (src_path, dst_path))
             shutil.copy(src_path, dst_path)
-        print("copy %s -> %s" % (src_path, dst_path))
 
     def updateCondaEnv(self, unzipPath):
 
@@ -322,10 +330,8 @@ class UpgradeIdps(object):
 
         # 根据上级目录判定升级包是否在正确目录
         print(os.listdir('../'))
-        idps_core_path = os.path.exists('../idps-core')
-        idps_portal_path = os.path.exists('../idps-portal')
-        idps_executor_path = os.path.exists('../idps-executor')
-        if not (idps_core_path and idps_portal_path and idps_executor_path):
+        idps_core_path = os.path.exists('../idps')
+        if not (idps_core_path):
             print("请将升级包放在正确目录！")
             os.system("pause")
             raise Exception("请将升级包放在正确目录！")
@@ -355,24 +361,31 @@ if __name__ == '__main__':
 
     # 解压
     unzipPath = upgrade.unzipUpgrade(path)
+
+
     #
-    # 备份数据库
-    upgrade.dbBackup()
+    # #
+    # # 备份数据库
+    # upgrade.dbBackup()
+    # #
+    # # 备份idps
+    # upgrade.backupIdps()
     #
-    # 备份idps
-    upgrade.backupIdps()
-
-    # 备份环境变量 2.5.1环境变量未变化
-    # upgrade.backupAndUpdateCondaEnv()
-
-    # 执行sql
-    upgrade.executeUpgradeSqlFile(unzipPath)
-
-    # 更新idps
-    upgrade.copyUpgradeToIdps(unzipPath)
-
-    # 更新conda env
-    # upgrade.updateCondaEnv(unzipPath)
+    # # 备份环境变量 2.5.1环境变量未变化
+    # # upgrade.backupAndUpdateCondaEnv()
     #
-    print("升级程序执行完成！")
-    os.system('pause')
+    # # 执行sql
+    # upgrade.executeUpgradeSqlFile(unzipPath)
+    #
+    # # 更新idps
+    # upgrade.copyUpgradeToIdps(unzipPath)
+    #
+    # # 更新conda env
+    # # upgrade.updateCondaEnv(unzipPath)
+    # #
+    # print("升级程序执行完成！")
+    # os.system('pause')
+    #
+    # # 删除解压文件
+    # shutil.rmtree(os.path.dirname(os.path.realpath(unzipPath)))
+    # print("delete tmp: " + os.path.dirname(os.path.realpath(unzipPath)))
